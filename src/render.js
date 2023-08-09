@@ -2,30 +2,30 @@ import onChange from 'on-change';
 import elements from './elements.js';
 
 const state = {
-    RSSform: {
-      state: 'valid',
-      data: {
-        url: '',
-      },
-      errors: {},
+  RSSform: {
+    state: 'valid',
+    data: {
+      url: '',
     },
-    RSSfeeds: {
-      urls: ['aaa'],
-    },
-  };
-  
-  const render = () => {
-    if (state.RSSform.state === 'valid') {
-      elements.input.classList.remove('is-invalid');
-      elements.form.reset();
-      elements.input.focus();
-    }
-    if (state.RSSform.state === 'invalid') {
-      elements.input.classList.add('is-invalid');
-      elements.input.value = watchedState.RSSform.data.url;
-    }
-  };
-  
-  const watchedState = onChange(state, render);
+    errors: {},
+  },
+  RSSfeeds: {
+    urls: ['aaa'],
+  },
+};
 
-  export { watchedState, state };
+const render = () => {
+  if (state.RSSform.state === 'valid') {
+    elements.input.classList.remove('is-invalid');
+    elements.form.reset();
+    elements.input.focus();
+  }
+  if (state.RSSform.state === 'invalid') {
+    elements.input.classList.add('is-invalid');
+    elements.input.value = state.RSSform.data.url;
+  }
+};
+
+const watchedState = onChange(state, render);
+
+export { watchedState, state };

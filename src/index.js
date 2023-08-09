@@ -1,11 +1,11 @@
 import './styles.scss';
 import 'bootstrap';
-import elements from './elements.js';
-import {watchedState, state} from './render.js';
-
 import * as yup from 'yup';
-import keyBy from 'lodash/keyBy.js';
 import isEmpty from 'lodash/isEmpty.js';
+import elements from './elements.js';
+import { watchedState, state } from './render.js';
+
+// import keyBy from 'lodash/keyBy.js';
 
 const validate = (fields) => {
   const schema = yup.object({
@@ -21,11 +21,11 @@ const validate = (fields) => {
       console.log(e.errors);
       return (e.errors);
     });
-  
+
   return promise;
 };
- 
-elements.form.addEventListener('submit', async(e) => {
+
+elements.form.addEventListener('submit', (e) => {
   e.preventDefault();
   watchedState.RSSform.data.url = elements.input.value;
   const errorsPromise = validate(watchedState.RSSform.data)
@@ -38,6 +38,6 @@ elements.form.addEventListener('submit', async(e) => {
         watchedState.RSSform.state = 'invalid';
       }
       console.log(state);
-    })
+    });
   return errorsPromise;
 });
