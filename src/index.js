@@ -16,7 +16,7 @@ const validate = (fields) => {
   });
 
   const promise = schema.validate(fields)
-    .then(() => {})
+    .then(() => [])
     .catch((e) => {
       console.log(e.errors);
       return (e.errors);
@@ -30,7 +30,7 @@ elements.form.addEventListener('submit', (e) => {
   watchedState.RSSform.data.url = elements.input.value;
   const errorsPromise = validate(watchedState.RSSform.data)
     .then((errors) => {
-      watchedState.RSSform.errors = errors;
+      watchedState.RSSform.errors = errors.join();
       if (isEmpty(errors)) {
         watchedState.RSSform.state = 'valid';
         watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
