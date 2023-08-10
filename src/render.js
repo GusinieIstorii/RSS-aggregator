@@ -16,6 +16,7 @@ const state = {
   },
 };
 
+// init должен здесь инициироваться или где-то еще?
 i18next.init({
   lng: 'ru',
   debug: true,
@@ -27,7 +28,7 @@ i18next.init({
   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
-  document.querySelector('[class="mt-2 mb-0 text-muted"]').innerHTML = i18next.t('example');
+  document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
 });
 
 const render = () => {
@@ -43,7 +44,7 @@ const render = () => {
       elements.error.innerHTML = i18next.t('errorDuplicates');
     }
     if (state.RSSform.errors.includes('url must be a valid URL')) {
-      elements.error.innerHTML = i18next.t('errorLink');
+      elements.error.innerHTML = i18next.t('errorLink'); // почему тут пролетело без промисов?
     }
   }
 };
