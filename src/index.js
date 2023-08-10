@@ -2,7 +2,8 @@ import './styles.scss';
 import 'bootstrap';
 import * as yup from 'yup';
 import isEmpty from 'lodash/isEmpty.js';
-import axios, { isCancel, AxiosError } from 'axios';
+import axios from 'axios';
+import parseRSS from './parseRSS.js';
 import elements from './elements.js';
 import { watchedState, state } from './render.js';
 
@@ -11,15 +12,12 @@ const validate = (fields) => {
     url: yup.string()
       .url()
       .nullable()
-      .notOneOf(watchedState.RSSfeeds.urls),
+      .notOneOf(watchedState.RSSfeeds.urls, 'url must not be one of the following values'),
   });
 
   const promise = schema.validate(fields)
     .then(() => [])
-    .catch((e) => {
-      console.log(e.errors);
-      return (e.errors);
-    });
+    .catch((e) => e.errors);
 
   return promise;
 };
@@ -37,49 +35,26 @@ const validate = (fields) => {
 //   return responsePromise;
 // };
 
-const parse = (response) => {
-  const parser = new DOMParser();
-  const content = response.data.contents;
-  const doc = parser.parseFromString(content, 'text/html');
-  console.log(doc);
-  const posts = doc.querySelectorAll('item');
-  console.log(posts); // nodelist - success
-  const list = posts.forEach(() => {
-    // const itemTitle = item.querySelector('title').innerHTML;
-    // const itemLink = item.querySelector('limk').innerHTML;
-    // return { itemTitle, itemLink };
-    return 1;
-  });
-  console.log(list); // undefined ???
-
-  // const result = {
-  //   url: response.data.status.url,
-  //   feedTitle: doc.querySelector('title').innerHTML,
-  //   feedDesc: doc.querySelector('description').innerHTML,
-  //   // posts,
-  // };
-  
-  // return result;
-};
-
 elements.form.addEventListener('submit', (e) => {
   e.preventDefault();
   watchedState.RSSform.data.url = elements.input.value;
   const errorsPromise = validate(watchedState.RSSform.data)
-    .then((errors) => {
-      watchedState.RSSform.errors = errors.join();
-      if (isEmpty(errors)) {
-        watchedState.RSSform.state = 'valid';
-        watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
-        // здесь кажется не хватает асинхронности
-        const responsePromise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${watchedState.RSSform.data.url}`)
+    .then((validationErrors) => {
+      watchedState.RSSform.errors = validationErrors.join();
+      if (isEmpty(validationErrors)) {
+        // здесь кажется не хватает асинхронности ???
+        axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${watchedState.RSSform.data.url}`)
           .then((response) => {
-            console.log(response);
-            parse(response);
-            return response;
+            const parsedResponse = parseRSS(response);
+            watchedState.RSSform.state = 'valid';
+            watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
+            watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
+            watchedState.RSSfeeds.posts.push(parsedResponse.posts);
+            watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+            return parsedResponse;
           })
           .catch((er) => {
-            console.log(er.errors);
+            watchedState.RSSform.errors = 'parsing error';
             return (er.errors);
           });
         // return responsePromise;
@@ -87,6 +62,7 @@ elements.form.addEventListener('submit', (e) => {
         watchedState.RSSform.state = 'invalid';
       }
     });
+
   console.log(state);
   return errorsPromise;
 });

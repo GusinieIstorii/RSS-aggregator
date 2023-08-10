@@ -7,5 +7,9 @@ export default {
     example: 'Пример: https://ru.hexlet.io/lessons.rss',
     errorDuplicates: 'RSS уже существует',
     errorLink: 'Ссылка должна быть валидным URL',
+    errorParse: 'Ресурс не содержит валидный RSS',
+    successMessage: 'RSS успешно загружен',
+    feedsHeader: 'Фиды',
+    postsHeader: 'Посты',
   },
 };
