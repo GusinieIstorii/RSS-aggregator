@@ -7,7 +7,8 @@ const parseRSS = (response) => {
   items.forEach((item) => {
     const itemTitle = item.querySelector('title').innerHTML;
     const itemLink = item.querySelector('link').innerHTML;
-    posts.push({ itemTitle, itemLink });
+    const itemDesc = item.querySelector('description').innerHTML;
+    posts.push({ itemTitle, itemLink, itemDesc });
   });
   const result = {
     feed: {
@@ -17,7 +18,6 @@ const parseRSS = (response) => {
     },
     posts,
   };
-  console.log(result);
   return result;
 };
 

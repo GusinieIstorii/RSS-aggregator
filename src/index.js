@@ -24,7 +24,6 @@ const validate = (fields) => {
 
 const checkEvery5Sec = () => {
   setTimeout(() => {
-    console.log(5);
     // есть подозрение что тут должно быть промис ол
     const promises = state.RSSfeeds.urls.map((url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`));
     const promise = Promise.all(promises);
@@ -36,10 +35,15 @@ const checkEvery5Sec = () => {
         const newPosts = parsedResponse.posts
           .filter((postNewResponse) => !actualPostsLinks.includes(postNewResponse.itemLink));
         watchedState.RSSfeeds.posts.push(newPosts);
-        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat()
+          .map((post) => {
+            post.uiState = 'not visited';
+            return post;
+          });
         return newPosts;
       });
     })
+      .catch((e) => console.log(e))
       .then(checkEvery5Sec);
   }, '5000');
 };
@@ -56,11 +60,15 @@ elements.form.addEventListener('submit', (e) => {
           .then((response) => {
             const parsedResponse = parseRSS(response);
             watchedState.RSSform.errors = 'success';
-            watchedState.RSSform.state = 'valid';
+            // watchedState.RSSform.state = 'valid';
             watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
             watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
             watchedState.RSSfeeds.posts.push(parsedResponse.posts);
-            watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+            watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat()
+              .map((post) => {
+                post.uiState = 'not visited';
+                return post;
+              });
             return parsedResponse;
           })
           .catch((er) => {
@@ -74,4 +82,12 @@ elements.form.addEventListener('submit', (e) => {
 
   console.log(state);
   return errorsPromise;
+});
+
+const postsContainer = document.querySelector('.posts');
+const postItems = postsContainer.querySelectorAll('li');
+postItems.forEach((postItem) => {
+  postItem.addEventListener('click', () => {
+    console.log('hi');
+  });
 });

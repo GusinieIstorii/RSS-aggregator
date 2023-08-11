@@ -129,7 +129,13 @@ const render = () => {
       const a = document.createElement('a');
       a.setAttribute('href', post.itemLink);
       // a.classList.add('fw-normal', 'link-secondary');
-      a.classList.add('fw-bold');
+      if (post.uiState === 'not visited') {
+        a.classList.add('fw-bold');
+      }
+      if (post.uiState === 'visited') {
+        a.classList.remove('fw-bold');
+        a.classList.add('fw-normal', 'link-secondary');
+      }
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
       a.innerHTML = post.itemTitle;
