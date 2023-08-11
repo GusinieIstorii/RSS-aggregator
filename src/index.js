@@ -22,18 +22,27 @@ const validate = (fields) => {
   return promise;
 };
 
-// const getRSSresponse = (url) => {
-//   const responsePromise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
-//     .then((response) => {
-//       console.log(response);
-//       return response;
-//     })
-//     .catch((er) => {
-//       console.log(er.errors);
-//       return (er.errors);
-//     });
-//   return responsePromise;
-// };
+const checkEvery5Sec = () => {
+  setTimeout(() => {
+    console.log(5);
+    // есть подозрение что тут должно быть промис ол
+    const promises = state.RSSfeeds.urls.map((url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`));
+    const promise = Promise.all(promises);
+    promise.then((responses) => {
+      responses.map((response) => {
+        const parsedResponse = parseRSS(response);
+        const actualPostsLinks = [];
+        state.RSSfeeds.posts.forEach((post) => actualPostsLinks.push(post.itemLink));
+        const newPosts = parsedResponse.posts
+          .filter((postNewResponse) => !actualPostsLinks.includes(postNewResponse.itemLink));
+        watchedState.RSSfeeds.posts.push(newPosts);
+        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        return newPosts;
+      });
+    })
+      .then(checkEvery5Sec);
+  }, '5000');
+};
 
 elements.form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -42,10 +51,11 @@ elements.form.addEventListener('submit', (e) => {
     .then((validationErrors) => {
       watchedState.RSSform.errors = validationErrors.join();
       if (isEmpty(validationErrors)) {
-        // здесь кажется не хватает асинхронности ???
+        // здесь кажется не хватает асинхронности или я в аду колбеков?
         axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${watchedState.RSSform.data.url}`)
           .then((response) => {
             const parsedResponse = parseRSS(response);
+            watchedState.RSSform.errors = 'success';
             watchedState.RSSform.state = 'valid';
             watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
             watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
@@ -56,10 +66,9 @@ elements.form.addEventListener('submit', (e) => {
           .catch((er) => {
             watchedState.RSSform.errors = 'parsing error';
             return (er.errors);
-          });
-        // return responsePromise;
-      } else {
-        watchedState.RSSform.state = 'invalid';
+          })
+          .then(checkEvery5Sec);
+        // return responsePromise; не очень понимаю где то что должно возвращаться
       }
     });
 

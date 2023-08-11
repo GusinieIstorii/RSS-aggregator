@@ -17,6 +17,7 @@ const parseRSS = (response) => {
     },
     posts,
   };
+  console.log(result);
   return result;
 };
 

@@ -12,7 +12,7 @@ const state = {
     errors: '',
   },
   RSSfeeds: {
-    urls: ['aaa'],
+    urls: [],
     feeds: [],
     posts: [],
   },
@@ -50,26 +50,29 @@ const feedbackRender = (feedback) => {
       elements.error.classList.add('text-danger');
       elements.error.innerHTML = i18next.t('errorParse');
       break;
-    case '':
+    case 'success':
       elements.error.classList.add('text-success');
       elements.error.classList.remove('text-danger');
       elements.error.innerHTML = i18next.t('successMessage');
       break;
     default:
-      elements.error.innerHTML = 'feedback is not defined';
+      elements.error.innerHTML = '';
   }
 };
 
 const render = () => {
   feedbackRender(state.RSSform.errors);
-  if (state.RSSform.state === 'valid') {
+  if (state.RSSform.errors === 'url must not be one of the following values'
+   || state.RSSform.errors === 'url must be a valid URL') {
+    elements.input.classList.add('is-invalid');
+    elements.input.value = state.RSSform.data.url;
+  } else if (state.RSSform.errors === 'parsing error') {
+    elements.input.classList.remove('is-invalid');
+    elements.input.value = state.RSSform.data.url;
+  } else if (state.RSSform.errors === 'success') {
     elements.input.classList.remove('is-invalid');
     elements.form.reset();
     elements.input.focus();
-  }
-  if (state.RSSform.state === 'invalid') {
-    elements.input.classList.add('is-invalid');
-    elements.input.value = state.RSSform.data.url;
   }
 
   if (state.RSSfeeds.feeds.length > 0) {
