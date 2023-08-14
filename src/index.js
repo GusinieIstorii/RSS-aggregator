@@ -1,5 +1,6 @@
 import './styles.scss';
 import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import isEmpty from 'lodash/isEmpty.js';
 import axios from 'axios';
@@ -24,7 +25,7 @@ const validate = (fields) => {
 
 const checkEvery5Sec = () => {
   setTimeout(() => {
-    // есть подозрение что тут должно быть промис ол
+    // хз как проверить не уверена что работает
     const promises = state.RSSfeeds.urls.map((url) => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`));
     const promise = Promise.all(promises);
     promise.then((responses) => {
@@ -35,11 +36,7 @@ const checkEvery5Sec = () => {
         const newPosts = parsedResponse.posts
           .filter((postNewResponse) => !actualPostsLinks.includes(postNewResponse.itemLink));
         watchedState.RSSfeeds.posts.push(newPosts);
-        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat()
-          .map((post) => {
-            post.uiState = 'not visited';
-            return post;
-          });
+        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
         return newPosts;
       });
     })
@@ -64,11 +61,7 @@ elements.form.addEventListener('submit', (e) => {
             watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
             watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
             watchedState.RSSfeeds.posts.push(parsedResponse.posts);
-            watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat()
-              .map((post) => {
-                post.uiState = 'not visited';
-                return post;
-              });
+            watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
             return parsedResponse;
           })
           .catch((er) => {
@@ -85,9 +78,22 @@ elements.form.addEventListener('submit', (e) => {
 });
 
 const postsContainer = document.querySelector('.posts');
-const postItems = postsContainer.querySelectorAll('li');
-postItems.forEach((postItem) => {
-  postItem.addEventListener('click', () => {
-    console.log('hi');
-  });
+postsContainer.addEventListener('click', (e) => {
+  const targetEl = e.target;
+  if (targetEl.localName === 'button' || targetEl.localName === 'a') {
+    const li = targetEl.parentElement;
+    const linkEl = li.querySelector('a');
+    const link = linkEl.getAttribute('href');
+    console.log(link);
+    watchedState.RSSfeeds.posts.map((post) => {
+      if (post.itemLink === link) {
+        post.uiState = 'visited';
+      }
+      return post;
+    });
+
+    if (targetEl.localName === 'button') {
+      watchedState.UI.modal = 'active';
+    }
+  }
 });

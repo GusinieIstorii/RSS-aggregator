@@ -16,6 +16,9 @@ const state = {
     feeds: [],
     posts: [],
   },
+  UI: {
+    modal: '',
+  },
 };
 
 // init должен здесь инициироваться или где-то еще?
@@ -128,10 +131,7 @@ const render = () => {
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
       const a = document.createElement('a');
       a.setAttribute('href', post.itemLink);
-      // a.classList.add('fw-normal', 'link-secondary');
-      if (post.uiState === 'not visited') {
-        a.classList.add('fw-bold');
-      }
+      a.classList.add('fw-bold');
       if (post.uiState === 'visited') {
         a.classList.remove('fw-bold');
         a.classList.add('fw-normal', 'link-secondary');
@@ -147,6 +147,12 @@ const render = () => {
       li.append(btn);
       listOfPosts.append(li);
     });
+
+    // modal
+    // if (state.UI.modal === 'active') {
+    //   const body = document.querySelector('body');
+    //   body.classList.add('modal-open')
+    // }
   }
 };
 
