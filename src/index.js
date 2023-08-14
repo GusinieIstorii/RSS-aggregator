@@ -1,5 +1,5 @@
 import './styles.scss';
-import 'bootstrap';
+// import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import isEmpty from 'lodash/isEmpty.js';
@@ -80,11 +80,12 @@ elements.form.addEventListener('submit', (e) => {
 const postsContainer = document.querySelector('.posts');
 postsContainer.addEventListener('click', (e) => {
   const targetEl = e.target;
+  const li = targetEl.parentElement;
+  const linkEl = li.querySelector('a');
+  const link = linkEl.getAttribute('href');
+  console.log(link);
+
   if (targetEl.localName === 'button' || targetEl.localName === 'a') {
-    const li = targetEl.parentElement;
-    const linkEl = li.querySelector('a');
-    const link = linkEl.getAttribute('href');
-    console.log(link);
     watchedState.RSSfeeds.posts.map((post) => {
       if (post.itemLink === link) {
         post.uiState = 'visited';
@@ -93,7 +94,8 @@ postsContainer.addEventListener('click', (e) => {
     });
 
     if (targetEl.localName === 'button') {
-      watchedState.UI.modal = 'active';
+      watchedState.UI.modal.postLink = link;
+      watchedState.UI.modal.status = 'active';
     }
   }
 });

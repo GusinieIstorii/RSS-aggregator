@@ -2,6 +2,8 @@ import onChange from 'on-change';
 import i18next from 'i18next';
 import elements from './elements.js';
 import ru from './locales/ru.js';
+// import 'bootstrap';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 const state = {
   RSSform: {
@@ -17,7 +19,10 @@ const state = {
     posts: [],
   },
   UI: {
-    modal: '',
+    modal: {
+      status: '',
+      postLink: '',
+    },
   },
 };
 
@@ -144,15 +149,26 @@ const render = () => {
       btn.setAttribute('type', 'button');
       btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
       btn.innerHTML = 'Просмотр';
+      btn.setAttribute('data-bs-toggle', 'modal');
+      btn.setAttribute('data-bs-target', '#modal');
       li.append(btn);
       listOfPosts.append(li);
     });
 
     // modal
-    // if (state.UI.modal === 'active') {
-    //   const body = document.querySelector('body');
-    //   body.classList.add('modal-open')
-    // }
+    if (state.UI.modal.status === 'active') {
+      const modalFade = document.querySelector('#modal');
+      const modalTitle = modalFade.querySelector('.modal-title');
+      const modalDesc = modalFade.querySelector('.modal-body');
+      const btnRead = modalFade.querySelector('.full-article');
+      btnRead.innerHTML = 'Читать полностью';
+      const currentPostArray = state.RSSfeeds.posts
+        .filter((post) => post.itemLink === state.UI.modal.postLink);
+      const [currentPost] = currentPostArray;
+      modalTitle.innerHTML = currentPost.itemTitle;
+      modalDesc.innerHTML = currentPost.itemDesc;
+      btnRead.setAttribute('href', currentPost.itemLink);
+    }
   }
 };
 
