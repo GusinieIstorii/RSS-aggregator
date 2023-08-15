@@ -11,5 +11,7 @@ export default {
     successMessage: 'RSS успешно загружен',
     feedsHeader: 'Фиды',
     postsHeader: 'Посты',
+    btnRead: 'Читать полностью',
+    btnCheckOut: 'Просмотр',
   },
 };

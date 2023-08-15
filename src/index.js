@@ -2,11 +2,21 @@ import './styles.scss';
 // import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
+import i18next from 'i18next';
 import isEmpty from 'lodash/isEmpty.js';
 import axios from 'axios';
+import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
 import { watchedState, state } from './render.js';
+
+i18next.init({
+  lng: 'ru',
+  debug: true,
+  resources: {
+    ru,
+  },
+});
 
 const validate = (fields) => {
   const schema = yup.object({
