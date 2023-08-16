@@ -60,7 +60,7 @@ export default () => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     watchedState.RSSform.data.url = elements.input.value;
-    const errorsPromise = validate(watchedState.RSSform.data)
+    validate(watchedState.RSSform.data)
       .then((validationErrors) => {
         watchedState.RSSform.errors = validationErrors.join();
         if (isEmpty(validationErrors)) {
@@ -84,7 +84,7 @@ export default () => {
       });
 
     console.log(state);
-    return errorsPromise;
+    // return errorsPromise;
   });
 
   checkEvery5Sec();
