@@ -22,4 +22,4 @@ Keep all your favourite RSS sourses in one place and get new articles automatica
 1. Enter 'make install' and 'make develop' in your console
 1. Congratulations! Installation is completed.
 
-[Visit the website!](https://frontend-project-11-wine-seven.vercel.app/) <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="50">
+### [Visit the website!](https://frontend-project-11-wine-seven.vercel.app/) <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="50">

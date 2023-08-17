@@ -2,16 +2,40 @@ import './styles.scss';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
+import onChange from 'on-change';
 import i18next from 'i18next';
 import isEmpty from 'lodash/isEmpty.js';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
-
-import { watchedState, state } from './render.js';
+// eslint-disable-next-line import/no-cycle
+import render from './render.js';
 import getResponse from './getResponse.js';
 
-export default () => {
+const state = {
+  RSSform: {
+    state: 'valid',
+    data: {
+      url: '',
+    },
+    errors: '',
+  },
+  RSSfeeds: {
+    urls: [],
+    feeds: [],
+    posts: [],
+  },
+  UI: {
+    modal: {
+      status: '',
+      postLink: '',
+    },
+  },
+};
+
+const watchedState = onChange(state, render);
+
+const app = () => {
   i18next.init({
     lng: 'ru',
     debug: true,
@@ -37,7 +61,6 @@ export default () => {
 
   const checkEvery5Sec = () => {
     setTimeout(() => {
-      // хз как проверить не уверена что работает
       const promises = state.RSSfeeds.urls.map((url) => getResponse(url));
       const promise = Promise.all(promises);
       promise.then((responses) => {
@@ -64,12 +87,10 @@ export default () => {
       .then((validationErrors) => {
         watchedState.RSSform.errors = validationErrors.join();
         if (isEmpty(validationErrors)) {
-          // здесь кажется не хватает асинхронности или я в аду колбеков?
           getResponse(state.RSSform.data.url)
             .then((response) => {
               const parsedResponse = parseRSS(response);
               watchedState.RSSform.errors = 'success';
-              // watchedState.RSSform.state = 'valid';
               watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
               watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
               watchedState.RSSfeeds.posts.push(parsedResponse.posts);
@@ -84,7 +105,6 @@ export default () => {
       });
 
     console.log(state);
-    // return errorsPromise;
   });
 
   checkEvery5Sec();
@@ -112,3 +132,5 @@ export default () => {
     }
   });
 };
+
+export { watchedState, app };

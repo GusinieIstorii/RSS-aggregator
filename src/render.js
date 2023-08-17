@@ -1,29 +1,9 @@
-import onChange from 'on-change';
+// import onChange from 'on-change';
 import i18next from 'i18next';
 import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-const state = {
-  RSSform: {
-    state: 'valid',
-    data: {
-      url: '',
-    },
-    errors: '',
-  },
-  RSSfeeds: {
-    urls: [],
-    feeds: [],
-    posts: [],
-  },
-  UI: {
-    modal: {
-      status: '',
-      postLink: '',
-    },
-  },
-};
+import { watchedState } from './app.js';
 
 const feedbackRender = (feedback) => {
   switch (feedback) {
@@ -68,7 +48,7 @@ const feedsRender = () => {
   const listOfFeeds = document.createElement('ul');
   listOfFeeds.classList.add('list-group', 'border-0', 'rounded-0');
   card.append(listOfFeeds);
-  state.RSSfeeds.feeds.forEach((feed) => {
+  watchedState.RSSfeeds.feeds.forEach((feed) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
     const h3 = document.createElement('h3');
@@ -100,7 +80,7 @@ const postsRender = () => {
   listOfPosts.classList.add('list-group', 'border-0', 'rounded-0');
   cardPosts.append(listOfPosts);
 
-  state.RSSfeeds.posts.forEach((post) => {
+  watchedState.RSSfeeds.posts.forEach((post) => {
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
@@ -126,14 +106,14 @@ const postsRender = () => {
 };
 
 const modalRender = () => {
-  if (state.UI.modal.status === 'active') {
+  if (watchedState.UI.modal.status === 'active') {
     const modalFade = document.querySelector('#modal');
     const modalTitle = modalFade.querySelector('.modal-title');
     const modalDesc = modalFade.querySelector('.modal-body');
     const btnRead = modalFade.querySelector('.full-article');
     btnRead.innerHTML = i18next.t('btnRead');
-    const currentPostArray = state.RSSfeeds.posts
-      .filter((post) => post.itemLink === state.UI.modal.postLink);
+    const currentPostArray = watchedState.RSSfeeds.posts
+      .filter((post) => post.itemLink === watchedState.UI.modal.postLink);
     const [currentPost] = currentPostArray;
     modalTitle.innerHTML = currentPost.itemTitle;
     modalDesc.innerHTML = currentPost.itemDesc;
@@ -148,27 +128,27 @@ const render = () => {
   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
 
-  feedbackRender(state.RSSform.errors);
-  if (state.RSSform.errors === 'url must not be one of the following values'
-   || state.RSSform.errors === 'url must be a valid URL') {
+  feedbackRender(watchedState.RSSform.errors);
+  if (watchedState.RSSform.errors === 'url must not be one of the following values'
+   || watchedState.RSSform.errors === 'url must be a valid URL') {
     elements.input.classList.add('is-invalid');
-    elements.input.value = state.RSSform.data.url;
-  } else if (state.RSSform.errors === 'parsing error') {
+    elements.input.value = watchedState.RSSform.data.url;
+  } else if (watchedState.RSSform.errors === 'parsing error') {
     elements.input.classList.remove('is-invalid');
-    elements.input.value = state.RSSform.data.url;
-  } else if (state.RSSform.errors === 'success') {
+    elements.input.value = watchedState.RSSform.data.url;
+  } else if (watchedState.RSSform.errors === 'success') {
     elements.input.classList.remove('is-invalid');
     elements.form.reset();
     elements.input.focus();
   }
 
-  if (state.RSSfeeds.feeds.length > 0) {
+  if (watchedState.RSSfeeds.feeds.length > 0) {
     feedsRender();
     postsRender();
     modalRender();
   }
 };
 
-const watchedState = onChange(state, render);
+// const watchedState = onChange(state, render);
 
-export { watchedState, state };
+export default render;
