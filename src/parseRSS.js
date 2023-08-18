@@ -12,7 +12,6 @@ const parseRSS = (response) => {
   });
   const result = {
     feed: {
-      url: response.data.status.url,
       feedTitle: doc.querySelector('title').innerHTML,
       feedDesc: doc.querySelector('description').innerHTML,
     },

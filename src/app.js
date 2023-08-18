@@ -8,7 +8,6 @@ import isEmpty from 'lodash/isEmpty.js';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
-// eslint-disable-next-line import/no-cycle
 import render from './render.js';
 import getResponse from './getResponse.js';
 
@@ -33,7 +32,9 @@ const state = {
   },
 };
 
-const watchedState = onChange(state, render);
+const watchedState = onChange(state, function f() {
+  render(this);
+});
 
 const app = () => {
   i18next.init({
@@ -115,7 +116,6 @@ const app = () => {
     const li = targetEl.parentElement;
     const linkEl = li.querySelector('a');
     const link = linkEl.getAttribute('href');
-    console.log(link);
 
     if (targetEl.localName === 'button' || targetEl.localName === 'a') {
       watchedState.RSSfeeds.posts.map((post) => {

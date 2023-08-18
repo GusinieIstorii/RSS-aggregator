@@ -3,7 +3,7 @@ import i18next from 'i18next';
 import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { watchedState } from './app.js';
+// import { watchedState } from './app.js';
 
 const feedbackRender = (feedback) => {
   switch (feedback) {
@@ -32,7 +32,7 @@ const feedbackRender = (feedback) => {
   }
 };
 
-const feedsRender = () => {
+const feedsRender = (watchedState) => {
   const feedsContainer = document.querySelector('.feeds');
   const card = document.createElement('div');
   card.classList.add('card', 'border-0');
@@ -63,7 +63,7 @@ const feedsRender = () => {
   });
 };
 
-const postsRender = () => {
+const postsRender = (watchedState) => {
   const postsContainer = document.querySelector('.posts');
   const cardPosts = document.createElement('div');
   cardPosts.classList.add('card', 'border-0');
@@ -105,7 +105,7 @@ const postsRender = () => {
   });
 };
 
-const modalRender = () => {
+const modalRender = (watchedState) => {
   if (watchedState.UI.modal.status === 'active') {
     const modalFade = document.querySelector('#modal');
     const modalTitle = modalFade.querySelector('.modal-title');
@@ -121,7 +121,7 @@ const modalRender = () => {
   }
 };
 
-const render = () => {
+const render = (watchedState) => {
   elements.button.innerHTML = i18next.t('button');
   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
@@ -143,9 +143,9 @@ const render = () => {
   }
 
   if (watchedState.RSSfeeds.feeds.length > 0) {
-    feedsRender();
-    postsRender();
-    modalRender();
+    feedsRender(watchedState);
+    postsRender(watchedState);
+    modalRender(watchedState);
   }
 };
 
