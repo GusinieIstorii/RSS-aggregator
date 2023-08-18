@@ -22,6 +22,11 @@ const feedbackRender = (feedback) => {
       elements.error.classList.add('text-danger');
       elements.error.innerHTML = i18next.t('errorParse');
       break;
+    case 'netWork error':
+      elements.error.classList.remove('text-success');
+      elements.error.classList.add('text-danger');
+      elements.error.innerHTML = i18next.t('errorNetwork');
+      break;
     case 'success':
       elements.error.classList.add('text-success');
       elements.error.classList.remove('text-danger');

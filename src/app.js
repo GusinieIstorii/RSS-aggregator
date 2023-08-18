@@ -66,6 +66,11 @@ const app = () => {
       const promise = Promise.all(promises);
       promise.then((responses) => {
         responses.map((response) => {
+          try {
+            parseRSS(response);
+          } catch {
+            watchedState.RSSform.errors = 'parsing error';
+          }
           const parsedResponse = parseRSS(response);
           const actualPostsLinks = [];
           state.RSSfeeds.posts.forEach((post) => actualPostsLinks.push(post.itemLink));
@@ -90,6 +95,11 @@ const app = () => {
         if (isEmpty(validationErrors)) {
           getResponse(state.RSSform.data.url)
             .then((response) => {
+              try {
+                parseRSS(response);
+              } catch {
+                watchedState.RSSform.errors = 'parsing error';
+              }
               const parsedResponse = parseRSS(response);
               watchedState.RSSform.errors = 'success';
               watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
@@ -99,7 +109,7 @@ const app = () => {
               return parsedResponse;
             })
             .catch((er) => {
-              watchedState.RSSform.errors = 'parsing error';
+              watchedState.RSSform.errors = 'netWork error';
               return (er.errors);
             });
         }

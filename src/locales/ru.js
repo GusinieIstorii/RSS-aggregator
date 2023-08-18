@@ -8,6 +8,7 @@ export default {
     errorDuplicates: 'RSS уже существует',
     errorLink: 'Ссылка должна быть валидным URL',
     errorParse: 'Ресурс не содержит валидный RSS',
+    errorNetwork: 'Ошибка сети',
     successMessage: 'RSS успешно загружен',
     feedsHeader: 'Фиды',
     postsHeader: 'Посты',
