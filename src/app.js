@@ -68,8 +68,9 @@ const app = () => {
         responses.map((response) => {
           try {
             parseRSS(response);
-          } catch {
+          } catch (err) {
             watchedState.RSSform.errors = 'parsing error';
+            return err;
           }
           const parsedResponse = parseRSS(response);
           const actualPostsLinks = [];
@@ -97,8 +98,9 @@ const app = () => {
             .then((response) => {
               try {
                 parseRSS(response);
-              } catch {
+              } catch (err) {
                 watchedState.RSSform.errors = 'parsing error';
+                return err;
               }
               const parsedResponse = parseRSS(response);
               watchedState.RSSform.errors = 'success';
