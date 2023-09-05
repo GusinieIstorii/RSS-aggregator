@@ -2,7 +2,7 @@ import './styles.scss';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
-import onChange from 'on-change';
+// import onChange from 'on-change';
 import i18next from 'i18next';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
@@ -36,9 +36,9 @@ const state = {
 //   render(this);
 // });
 
-const watchedState = createWatchState(state);
-
 const app = () => {
+  const watchedState = createWatchState(state);
+
   i18next.init({
     lng: 'ru',
     debug: true,
@@ -148,4 +148,4 @@ const app = () => {
   });
 };
 
-export { watchedState, app };
+export default app;
