@@ -7,7 +7,8 @@ import i18next from 'i18next';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
-import render from './render.js';
+// import render from './render.js';
+import createWatchState from './render.js';
 import getResponse from './getResponse.js';
 
 const state = {
@@ -31,9 +32,11 @@ const state = {
   },
 };
 
-const watchedState = onChange(state, function f() {
-  render(this);
-});
+// const watchedState = onChange(state, function f() {
+//   render(this);
+// });
+
+const watchedState = createWatchState(state);
 
 const app = () => {
   i18next.init({

@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import onChange from 'on-change';
 import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -153,5 +154,7 @@ const render = (watchedState) => {
 };
 
 // const watchedState = onChange(state, render);
+const createWatchState = (state) => onChange(state, render);
 
-export default render;
+// export default render;
+export default createWatchState;
