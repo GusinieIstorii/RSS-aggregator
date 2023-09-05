@@ -130,7 +130,8 @@ const modalRender = (watchedState) => {
 //   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
 //   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
 //   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
-//   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
+//   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').
+//   innerHTML = i18next.t('example');
 
 //   console.log(this);
 //   feedbackRender(this.RSSform.errors);
@@ -153,29 +154,29 @@ const modalRender = (watchedState) => {
 //     modalRender(this);
 //   }
 
-  // feedbackRender(watchedState.RSSform.errors);
-  // if (watchedState.RSSform.errors === 'url must not be one of the following values'
-  //  || watchedState.RSSform.errors === 'url must be a valid URL') {
-  //   elements.input.classList.add('is-invalid');
-  //   elements.input.value = watchedState.RSSform.data.url;
-  // } else if (watchedState.RSSform.errors === 'parsing error') {
-  //   elements.input.classList.remove('is-invalid');
-  //   elements.input.value = watchedState.RSSform.data.url;
-  // } else if (watchedState.RSSform.errors === 'success') {
-  //   elements.input.classList.remove('is-invalid');
-  //   elements.form.reset();
-  //   elements.input.focus();
-  // }
+// feedbackRender(watchedState.RSSform.errors);
+// if (watchedState.RSSform.errors === 'url must not be one of the following values'
+//  || watchedState.RSSform.errors === 'url must be a valid URL') {
+//   elements.input.classList.add('is-invalid');
+//   elements.input.value = watchedState.RSSform.data.url;
+// } else if (watchedState.RSSform.errors === 'parsing error') {
+//   elements.input.classList.remove('is-invalid');
+//   elements.input.value = watchedState.RSSform.data.url;
+// } else if (watchedState.RSSform.errors === 'success') {
+//   elements.input.classList.remove('is-invalid');
+//   elements.form.reset();
+//   elements.input.focus();
+// }
 
-  // if (watchedState.RSSfeeds.feeds.length > 0) {
-  //   feedsRender(watchedState);
-  //   postsRender(watchedState);
-  //   modalRender(watchedState);
-  // }
+// if (watchedState.RSSfeeds.feeds.length > 0) {
+//   feedsRender(watchedState);
+//   postsRender(watchedState);
+//   modalRender(watchedState);
+// }
 // };
 
 // const watchedState = onChange(state, render);
-const createWatchState = (state) => onChange(state, function f(path, value) {
+const createWatchState = (state) => onChange(state, function f() {
   elements.button.innerHTML = i18next.t('button');
   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
