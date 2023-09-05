@@ -1,9 +1,7 @@
-// import onChange from 'on-change';
 import i18next from 'i18next';
 import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import { watchedState } from './app.js';
 
 const feedbackRender = (feedback) => {
   switch (feedback) {

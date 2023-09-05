@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
-import isEmpty from 'lodash/isEmpty.js';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
@@ -53,11 +52,7 @@ const app = () => {
         .notOneOf(watchedState.RSSfeeds.urls, 'url must not be one of the following values'),
     });
 
-    const promise = schema.validate(fields)
-      .then(() => [])
-      .catch((e) => e.errors);
-
-    return promise;
+    return schema.validate(fields);
   };
 
   const checkEvery5Sec = () => {
@@ -82,7 +77,7 @@ const app = () => {
           return newPosts;
         });
       })
-        .catch((e) => console.log(e))
+        // .catch((e) => console.log(e)) имелось в виду просто убрать здесь отлов ошибок?
         .then(checkEvery5Sec);
     }, '5000');
   };
@@ -90,34 +85,39 @@ const app = () => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     watchedState.RSSform.data.url = elements.input.value;
-    validate(watchedState.RSSform.data)
-      .then((validationErrors) => {
-        watchedState.RSSform.errors = validationErrors.join();
-        if (isEmpty(validationErrors)) {
-          getResponse(state.RSSform.data.url)
-            .then((response) => {
-              try {
-                parseRSS(response);
-              } catch (err) {
-                watchedState.RSSform.errors = 'parsing error';
-                return err;
-              }
-              const parsedResponse = parseRSS(response);
-              watchedState.RSSform.errors = 'success';
-              watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
-              watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
-              watchedState.RSSfeeds.posts.push(parsedResponse.posts);
-              watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
-              return parsedResponse;
-            })
-            .catch((er) => {
-              watchedState.RSSform.errors = 'netWork error';
-              return (er.errors);
-            });
-        }
-      });
 
-    console.log(state);
+    validate(watchedState.RSSform.data)
+      .then(() => {
+        watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
+        watchedState.RSSform.errors = '';
+      })
+      .catch((er) => {
+        watchedState.RSSform.errors = er.errors.join();
+        return null;
+      })
+      .then(() => getResponse(state.RSSform.data.url))
+      .then((response) => {
+        if (watchedState.RSSform.errors) {
+          return null;
+        }
+        try {
+          parseRSS(response);
+        } catch (err) {
+          watchedState.RSSform.errors = 'parsing error';
+          console.log('parsing error');
+          return err;
+        }
+        const parsedResponse = parseRSS(response);
+        watchedState.RSSform.errors = 'success';
+        watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
+        watchedState.RSSfeeds.posts.push(parsedResponse.posts);
+        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        return parsedResponse;
+      })
+      .catch((er) => {
+        watchedState.RSSform.errors = 'netWork error';
+        return (er.errors);
+      });
   });
 
   checkEvery5Sec();
