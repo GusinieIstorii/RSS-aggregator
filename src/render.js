@@ -9,7 +9,7 @@ const feedbackRender = (feedback) => {
     case 'url must not be one of the following values':
       elements.error.classList.add('text-danger');
       elements.error.classList.remove('text-success');
-      elements.error.innerHTML = i18next.t('errorDuplicates'); // почему тут пролетело без промисов?
+      elements.error.innerHTML = i18next.t('errorDuplicates');
       break;
     case 'url must be a valid URL':
       elements.error.classList.add('text-danger');
@@ -33,6 +33,22 @@ const feedbackRender = (feedback) => {
       break;
     default:
       elements.error.innerHTML = '';
+  }
+};
+
+const formInputRender = (feedback, state) => {
+  if (feedback === 'url must not be one of the following values'
+   || feedback === 'url must be a valid URL') {
+    elements.input.classList.add('is-invalid');
+    elements.input.value = state.RSSform.data.url;
+  } else if (feedback === 'parsing error'
+  || feedback === 'netWork error') {
+    elements.input.classList.remove('is-invalid');
+    elements.input.value = state.RSSform.data.url;
+  } else if (feedback === 'success') {
+    elements.input.classList.remove('is-invalid');
+    elements.form.reset();
+    elements.input.focus();
   }
 };
 
@@ -125,84 +141,29 @@ const modalRender = (watchedState) => {
   }
 };
 
-// const render = (path, value) => {
-//   elements.button.innerHTML = i18next.t('button');
-//   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
-//   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
-//   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
-//   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').
-//   innerHTML = i18next.t('example');
-
-//   console.log(this);
-//   feedbackRender(this.RSSform.errors);
-//   if (this.RSSform.errors === 'url must not be one of the following values'
-//    || this.RSSform.errors === 'url must be a valid URL') {
-//     elements.input.classList.add('is-invalid');
-//     elements.input.value = this.RSSform.data.url;
-//   } else if (this.RSSform.errors === 'parsing error') {
-//     elements.input.classList.remove('is-invalid');
-//     elements.input.value = this.RSSform.data.url;
-//   } else if (this.RSSform.errors === 'success') {
-//     elements.input.classList.remove('is-invalid');
-//     elements.form.reset();
-//     elements.input.focus();
-//   }
-
-//   if (this.RSSfeeds.feeds.length > 0) {
-//     feedsRender(this);
-//     postsRender(this);
-//     modalRender(this);
-//   }
-
-// feedbackRender(watchedState.RSSform.errors);
-// if (watchedState.RSSform.errors === 'url must not be one of the following values'
-//  || watchedState.RSSform.errors === 'url must be a valid URL') {
-//   elements.input.classList.add('is-invalid');
-//   elements.input.value = watchedState.RSSform.data.url;
-// } else if (watchedState.RSSform.errors === 'parsing error') {
-//   elements.input.classList.remove('is-invalid');
-//   elements.input.value = watchedState.RSSform.data.url;
-// } else if (watchedState.RSSform.errors === 'success') {
-//   elements.input.classList.remove('is-invalid');
-//   elements.form.reset();
-//   elements.input.focus();
-// }
-
-// if (watchedState.RSSfeeds.feeds.length > 0) {
-//   feedsRender(watchedState);
-//   postsRender(watchedState);
-//   modalRender(watchedState);
-// }
-// };
-
-// const watchedState = onChange(state, render);
-const createWatchState = (state) => onChange(state, function f() {
+const createWatchState = (state) => onChange(state, function f(path, value) {
   elements.button.innerHTML = i18next.t('button');
   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
 
-  feedbackRender(this.RSSform.errors);
-  if (this.RSSform.errors === 'url must not be one of the following values'
-   || this.RSSform.errors === 'url must be a valid URL') {
-    elements.input.classList.add('is-invalid');
-    elements.input.value = this.RSSform.data.url;
-  } else if (this.RSSform.errors === 'parsing error') {
-    elements.input.classList.remove('is-invalid');
-    elements.input.value = this.RSSform.data.url;
-  } else if (this.RSSform.errors === 'success') {
-    elements.input.classList.remove('is-invalid');
-    elements.form.reset();
-    elements.input.focus();
+  if (path === 'RSSform.errors') {
+    feedbackRender(value);
+    formInputRender(value, state);
   }
 
-  if (this.RSSfeeds.feeds.length > 0) {
+  if (path === 'RSSfeeds.feeds') {
     feedsRender(this);
+  }
+
+  if (path === 'RSSfeeds.posts') {
     postsRender(this);
+  }
+
+  if (path === 'UI.modal.status') {
     modalRender(this);
   }
 });
 
-// export default render;
 export default createWatchState;
