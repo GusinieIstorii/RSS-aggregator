@@ -2,12 +2,10 @@ import './styles.scss';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as yup from 'yup';
-// import onChange from 'on-change';
 import i18next from 'i18next';
 import ru from './locales/ru.js';
 import parseRSS from './parseRSS.js';
 import elements from './elements.js';
-// import render from './render.js';
 import createWatchState from './render.js';
 import getResponse from './getResponse.js';
 
@@ -31,10 +29,6 @@ const state = {
     },
   },
 };
-
-// const watchedState = onChange(state, function f() {
-//   render(this);
-// });
 
 const app = () => {
   const watchedState = createWatchState(state);
@@ -62,6 +56,7 @@ const app = () => {
     setTimeout(() => {
       const promises = state.RSSfeeds.urls.map((url) => getResponse(url));
       const promise = Promise.all(promises);
+
       promise.then((responses) => {
         responses.map((response) => {
           try {
@@ -80,7 +75,7 @@ const app = () => {
           return newPosts;
         });
       })
-        // .catch((e) => console.log(e)) имелось в виду просто убрать здесь отлов ошибок?
+        .catch((e) => console.log(e))
         .then(checkEvery5Sec);
     }, '5000');
   };
@@ -113,8 +108,8 @@ const app = () => {
         const parsedResponse = parseRSS(response);
         watchedState.RSSform.errors = 'success';
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
-        watchedState.RSSfeeds.posts.push(parsedResponse.posts);
-        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        // watchedState.RSSfeeds.posts.push(parsedResponse.posts);
+        // watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
         return parsedResponse;
       })
       .catch((er) => {
