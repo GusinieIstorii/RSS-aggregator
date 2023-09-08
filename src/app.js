@@ -76,7 +76,7 @@ const app = () => {
         });
       })
         .catch((e) => console.log(e))
-        .then(checkEvery5Sec);
+        .finally(checkEvery5Sec);
     }, '5000');
   };
 
@@ -108,8 +108,8 @@ const app = () => {
         const parsedResponse = parseRSS(response);
         watchedState.RSSform.errors = 'success';
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
-        // watchedState.RSSfeeds.posts.push(parsedResponse.posts);
-        // watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        watchedState.RSSfeeds.posts.push(parsedResponse.posts);
+        watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
         return parsedResponse;
       })
       .catch((er) => {
