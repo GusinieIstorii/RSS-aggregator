@@ -1,10 +1,10 @@
-import i18next from 'i18next';
+// import i18next from 'i18nextInstance';
 import onChange from 'on-change';
 import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const feedbackRender = (feedback) => {
+const feedbackRender = (feedback, i18next) => {
   switch (feedback) {
     case 'url must not be one of the following values':
       elements.error.classList.add('text-danger');
@@ -52,7 +52,7 @@ const formInputRender = (feedback, state) => {
   }
 };
 
-const feedsRender = (watchedState) => {
+const feedsRender = (watchedState, i18next) => {
   const feedsContainer = document.querySelector('.feeds');
   const card = document.createElement('div');
   card.classList.add('card', 'border-0');
@@ -83,7 +83,7 @@ const feedsRender = (watchedState) => {
   });
 };
 
-const postsRender = (watchedState) => {
+const postsRender = (watchedState, i18next) => {
   const postsContainer = document.querySelector('.posts');
   const cardPosts = document.createElement('div');
   cardPosts.classList.add('card', 'border-0');
@@ -117,7 +117,7 @@ const postsRender = (watchedState) => {
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    btn.innerHTML = 'Просмотр';
+    btn.innerHTML = i18next.t('btnCheckOut');
     btn.setAttribute('data-bs-toggle', 'modal');
     btn.setAttribute('data-bs-target', '#modal');
     li.append(btn);
@@ -125,7 +125,7 @@ const postsRender = (watchedState) => {
   });
 };
 
-const modalRender = (watchedState) => {
+const modalRender = (watchedState, i18next) => {
   if (watchedState.UI.modal.status === 'active') {
     const modalFade = document.querySelector('#modal');
     const modalTitle = modalFade.querySelector('.modal-title');
@@ -141,7 +141,14 @@ const modalRender = (watchedState) => {
   }
 };
 
-const createWatchState = (state) => onChange(state, function f(path, value) {
+const btnRender = (watchedState) => {
+  if (watchedState.RSSform.signupState === 'sending') {
+    elements.button.disabled = true;
+  }
+  elements.button.disabled = false;
+};
+
+const createWatchState = (state, i18next) => onChange(state, function f(path, value) {
   elements.button.innerHTML = i18next.t('button');
   document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
   document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
@@ -149,20 +156,24 @@ const createWatchState = (state) => onChange(state, function f(path, value) {
   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
 
   if (path === 'RSSform.errors') {
-    feedbackRender(value);
+    feedbackRender(value, i18next);
     formInputRender(value, state);
   }
 
   if (path === 'RSSfeeds.feeds') {
-    feedsRender(this);
+    feedsRender(this, i18next);
   }
 
   if (path === 'RSSfeeds.posts') {
-    postsRender(this);
+    postsRender(this, i18next);
   }
 
   if (path === 'UI.modal.status') {
-    modalRender(this);
+    modalRender(this, i18next);
+  }
+
+  if (path === 'RSSform.signupState') {
+    btnRender(state);
   }
 });
 

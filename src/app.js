@@ -11,7 +11,7 @@ import getResponse from './getResponse.js';
 
 const state = {
   RSSform: {
-    state: 'valid',
+    signupState: 'filling',
     data: {
       url: '',
     },
@@ -30,16 +30,8 @@ const state = {
   },
 };
 
-const app = () => {
-  const watchedState = createWatchState(state);
-
-  i18next.init({
-    lng: 'ru',
-    debug: true,
-    resources: {
-      ru,
-    },
-  });
+const app = (i18nextInstance) => {
+  const watchedState = createWatchState(state, i18nextInstance);
 
   const validate = (fields) => {
     const schema = yup.object({
@@ -53,6 +45,36 @@ const app = () => {
   };
 
   const checkEvery5Sec = () => {
+  //   setTimeout(() => {
+  //     Promise.allSettled(state.RSSfeeds.urls.map((url) => getResponse(url)))
+  //       .then((responses) => {
+  //         responses.forEach((response) => {
+  //           if (response.status === 'rejected') {
+  //             throw new Error(response.reason);
+  //           } else {
+  //             try {
+  //               parseRSS(response);
+  //             } catch (err) {
+  //               console.log(err);
+  //               watchedState.RSSform.errors = 'parsing error';
+  //               return err;
+  //             }
+  //             const parsedResponse = parseRSS(response);
+  //             const actualPostsLinks = [];
+  //             state.RSSfeeds.posts.forEach((post) => actualPostsLinks.push(post.itemLink));
+  //             const newPosts = parsedResponse.posts
+  //             .filter((postNewResponse) => !actualPostsLinks.includes(postNewResponse.itemLink));
+  //             watchedState.RSSfeeds.posts.push(newPosts);
+  //             watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+  //             return newPosts;
+  //           }
+  //         });
+  //       })
+  //       .catch((e) => console.log(e))
+  //       .finally(checkEvery5Sec);
+  //   }, '5000');
+  // };
+
     setTimeout(() => {
       const promises = state.RSSfeeds.urls.map((url) => getResponse(url));
       const promise = Promise.all(promises);
@@ -82,6 +104,7 @@ const app = () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
+    watchedState.RSSform.signupState = 'sending';
     watchedState.RSSform.data.url = elements.input.value;
 
     validate(watchedState.RSSform.data)
@@ -91,9 +114,11 @@ const app = () => {
       })
       .catch((er) => {
         watchedState.RSSform.errors = er.errors.join();
+        watchedState.RSSform.signupState = 'sent';
         return null;
       })
       .then(() => getResponse(state.RSSform.data.url))
+      .catch((er) => console.log(er))
       .then((response) => {
         if (watchedState.RSSform.errors) {
           return null;
@@ -102,6 +127,7 @@ const app = () => {
           parseRSS(response);
         } catch (err) {
           watchedState.RSSform.errors = 'parsing error';
+          watchedState.RSSform.signupState = 'sent';
           console.log('parsing error');
           return err;
         }
@@ -110,10 +136,12 @@ const app = () => {
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
         watchedState.RSSfeeds.posts.push(parsedResponse.posts);
         watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
+        watchedState.RSSform.signupState = 'sent';
         return parsedResponse;
       })
       .catch((er) => {
         watchedState.RSSform.errors = 'netWork error';
+        watchedState.RSSform.signupState = 'sent';
         return (er.errors);
       });
   });
@@ -143,4 +171,15 @@ const app = () => {
   });
 };
 
-export default app;
+const runApp = () => {
+  const i18nextInstance = i18next.createInstance();
+  i18nextInstance.init({
+    lng: 'ru',
+    debug: true,
+    resources: {
+      ru,
+    },
+  }).then(app(i18nextInstance));
+};
+
+export default runApp;
