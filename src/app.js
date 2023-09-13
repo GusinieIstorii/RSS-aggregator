@@ -118,7 +118,6 @@ const app = (i18nextInstance) => {
         return null;
       })
       .then(() => getResponse(state.RSSform.data.url))
-      .catch((er) => console.log(er))
       .then((response) => {
         if (watchedState.RSSform.errors) {
           return null;
