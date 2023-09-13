@@ -119,6 +119,11 @@ const app = (i18nextInstance) => {
       })
       .then(() => getResponse(state.RSSform.data.url))
       .then((response) => {
+        if (response === 'http request error') {
+          watchedState.RSSform.errors = 'netWork error';
+          watchedState.RSSform.signupState = 'sent';
+          return null;
+        }
         if (watchedState.RSSform.errors) {
           return null;
         }
