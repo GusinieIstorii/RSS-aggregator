@@ -141,11 +141,11 @@ const modalRender = (watchedState, i18next) => {
   }
 };
 
-const btnRender = (watchedState) => {
+const handleFormDisabling = (watchedState) => {
   if (watchedState.RSSform.signupState === 'sending') {
-    elements.button.disabled = true;
+    elements.form.disabled = true;
   }
-  elements.button.disabled = false;
+  elements.form.disabled = false;
 };
 
 const createWatchState = (state, i18next) => onChange(state, function f(path, value) {
@@ -173,7 +173,7 @@ const createWatchState = (state, i18next) => onChange(state, function f(path, va
   }
 
   if (path === 'RSSform.signupState') {
-    btnRender(state);
+    handleFormDisabling(state);
   }
 });
 
