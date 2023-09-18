@@ -112,7 +112,7 @@ const app = (i18nextInstance) => {
       })
       .then((response) => {
         const parsedResponse = parseRSS(response);
-        watchedState.addingFeedProcess.errorMessage = '';
+        watchedState.addingFeedProcess.errorMessage = 'no error';
         watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
         watchedState.RSSfeeds.posts.push(parsedResponse.posts);

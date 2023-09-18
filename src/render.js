@@ -5,6 +5,7 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const feedbackRender = (errorMessage, i18next) => {
+  console.log(errorMessage);
   switch (errorMessage) {
     case 'url must not be one of the following values':
       elements.error.classList.add('text-danger');
@@ -26,7 +27,7 @@ const feedbackRender = (errorMessage, i18next) => {
       elements.error.classList.add('text-danger');
       elements.error.innerHTML = i18next.t('errorNetwork');
       break;
-    case '':
+    case 'no error':
       elements.error.classList.add('text-success');
       elements.error.classList.remove('text-danger');
       elements.error.innerHTML = i18next.t('successMessage');
