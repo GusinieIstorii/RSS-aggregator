@@ -11,11 +11,9 @@ import getResponse from './getResponse.js';
 
 const state = {
   RSSform: {
-    signupState: 'filling',
     data: {
       url: '',
     },
-    errors: '',
   },
   addingFeedProcess: {
     processState: 'nothing happens', // есть конечно сомнения насчет нейминга
@@ -103,47 +101,34 @@ const app = (i18nextInstance) => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     // блокируем отправку запроса, если предыдйший запрос все еще обрабатывается
-    if (watchedState.RSSform.signupState === 'sending') {
+    if (watchedState.addingFeedProcess.processState === 'sending') {
       return;
     }
     watchedState.RSSform.data.url = elements.input.value;
     validate(watchedState.RSSform.data)
       .then(() => {
-        watchedState.RSSform.errors = '';
-        watchedState.RSSform.signupState = 'sending';
+        watchedState.addingFeedProcess.processState = 'sending';
         return getResponse(state.RSSform.data.url);
       })
       .then((response) => {
         const parsedResponse = parseRSS(response);
-        watchedState.RSSform.errors = 'success';
+        watchedState.addingFeedProcess.errorMessage = '';
         watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
         watchedState.RSSfeeds.posts.push(parsedResponse.posts);
         watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
-        watchedState.RSSform.signupState = 'sent';
+        watchedState.addingFeedProcess.processState = 'nothing happens';
         return parsedResponse;
       })
       .catch((er) => {
         console.log(er.message);
-        // if array of errors has er.message
-        if (er.name === 'ValidationError') {
-          watchedState.RSSform.errors = er.message;
-          watchedState.RSSform.signupState = 'sent';
-          return (er.name);
+        const errorsMessages = ['url must be a valid URL', 'url must not be one of the following values', 'parsing error', 'netWork error'];
+        if (errorsMessages.includes(er.message)) {
+          watchedState.addingFeedProcess.errorMessage = er.message;
+          watchedState.addingFeedProcess.processState = 'completed with error';
+        } else {
+          throw new Error('unknown error');
         }
-        if (er.message === 'parsing error') {
-          watchedState.RSSform.errors = 'parsing error';
-          watchedState.RSSform.signupState = 'sent';
-          return (er);
-        }
-        if (er.message === 'netWork error') {
-          watchedState.RSSform.errors = 'netWork error';
-          watchedState.RSSform.signupState = 'sent';
-          return null;
-        }
-        watchedState.RSSform.errors = 'netWork error';
-        watchedState.RSSform.signupState = 'sent';
-        return (er.errors);
       });
   });
 
@@ -165,8 +150,8 @@ const app = (i18nextInstance) => {
       });
 
       if (targetEl.localName === 'button') {
-        watchedState.UI.modal.postLink = link;
         watchedState.UI.modal.status = 'active';
+        watchedState.UI.modal.postLink = link;
       }
     }
   });

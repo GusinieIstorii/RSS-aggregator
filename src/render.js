@@ -4,8 +4,8 @@ import elements from './elements.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const feedbackRender = (feedback, i18next) => {
-  switch (feedback) {
+const feedbackRender = (errorMessage, i18next) => {
+  switch (errorMessage) {
     case 'url must not be one of the following values':
       elements.error.classList.add('text-danger');
       elements.error.classList.remove('text-success');
@@ -26,7 +26,7 @@ const feedbackRender = (feedback, i18next) => {
       elements.error.classList.add('text-danger');
       elements.error.innerHTML = i18next.t('errorNetwork');
       break;
-    case 'success':
+    case '':
       elements.error.classList.add('text-success');
       elements.error.classList.remove('text-danger');
       elements.error.innerHTML = i18next.t('successMessage');
@@ -36,16 +36,19 @@ const feedbackRender = (feedback, i18next) => {
   }
 };
 
-const formInputRender = (feedback, state) => {
-  if (feedback === 'url must not be one of the following values'
-   || feedback === 'url must be a valid URL') {
-    elements.input.classList.add('is-invalid');
-    elements.input.value = state.RSSform.data.url;
-  } else if (feedback === 'parsing error'
-  || feedback === 'netWork error') {
-    elements.input.classList.remove('is-invalid');
-    elements.input.value = state.RSSform.data.url;
-  } else if (feedback === 'success') {
+const formInputRender = (processState, state) => {
+  if (processState === 'completed with error') {
+    const { errorMessage } = state.addingFeedProcess;
+    if (errorMessage === 'url must not be one of the following values'
+   || errorMessage === 'url must be a valid URL') {
+      elements.input.classList.add('is-invalid');
+      elements.input.value = state.RSSform.data.url;
+    } else if (errorMessage === 'parsing error'
+  || errorMessage === 'netWork error') {
+      elements.input.classList.remove('is-invalid');
+      elements.input.value = state.RSSform.data.url;
+    }
+  } else {
     elements.input.classList.remove('is-invalid');
     elements.form.reset();
     elements.input.focus();
@@ -141,8 +144,8 @@ const modalRender = (watchedState, i18next) => {
   }
 };
 
-const handleFormDisabling = (watchedState) => {
-  if (watchedState.RSSform.signupState === 'sending') {
+const handleFormDisabling = (processState) => {
+  if (processState === 'sending') {
     elements.form.disabled = true;
   }
   elements.form.disabled = false;
@@ -155,9 +158,13 @@ const createWatchState = (state, i18next) => onChange(state, function f(path, va
   document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
   document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
 
-  if (path === 'RSSform.errors') {
-    feedbackRender(value, i18next);
+  if (path === 'addingFeedProcess.processState') {
+    handleFormDisabling(value);
     formInputRender(value, state);
+  }
+
+  if (path === 'addingFeedProcess.errorMessage') {
+    feedbackRender(value, i18next);
   }
 
   if (path === 'RSSfeeds.feeds') {
@@ -168,12 +175,8 @@ const createWatchState = (state, i18next) => onChange(state, function f(path, va
     postsRender(this, i18next);
   }
 
-  if (path === 'UI.modal.status') {
+  if (path === 'UI.modal.postLink') {
     modalRender(this, i18next);
-  }
-
-  if (path === 'RSSform.signupState') {
-    handleFormDisabling(state);
   }
 });
 
