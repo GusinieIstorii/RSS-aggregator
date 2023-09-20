@@ -5,7 +5,7 @@ const getResponse = (url) => {
   const promise = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
     .then((result) => result)
     .catch(() => {
-      throw new Error('netWork error');
+      throw new Error('errorNetwork');
     });
   return promise;
 };

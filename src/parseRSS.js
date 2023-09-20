@@ -25,7 +25,7 @@ const parseRSS = (response) => {
     };
     return result;
   } catch (e) {
-    throw new Error('parsing error');
+    throw new Error('errorParse');
   }
 };
 

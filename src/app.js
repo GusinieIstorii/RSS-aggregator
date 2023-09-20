@@ -16,7 +16,7 @@ const state = {
     },
   },
   addingFeedProcess: {
-    processState: 'nothing happens', // есть конечно сомнения насчет нейминга
+    processState: 'idle', // есть конечно сомнения насчет нейминга
     errorMessage: '',
   },
   RSSfeeds: {
@@ -26,7 +26,6 @@ const state = {
   },
   UI: {
     modal: {
-      status: '',
       postLink: '',
     },
   },
@@ -38,9 +37,9 @@ const app = (i18nextInstance) => {
   const validate = (fields) => {
     const schema = yup.object({
       url: yup.string()
-        .url()
+        .url('errorLink')
         .nullable()
-        .notOneOf(watchedState.RSSfeeds.urls, 'url must not be one of the following values'),
+        .notOneOf(watchedState.RSSfeeds.urls, 'errorDuplicates'),
     });
 
     return schema.validate(fields);
@@ -71,39 +70,9 @@ const app = (i18nextInstance) => {
     }, '5000');
   };
 
-  //   setTimeout(() => {
-  //     const promises = state.RSSfeeds.urls.map((url) => getResponse(url));
-  //     const promise = Promise.all(promises);
-
-  //     promise.then((responses) => {
-  //       responses.map((response) => {
-  //         try {
-  //           parseRSS(response);
-  //         } catch (err) {
-  //           watchedState.RSSform.errors = 'parsing error';
-  //           return err;
-  //         }
-  //         const parsedResponse = parseRSS(response);
-  //         const actualPostsLinks = [];
-  //         state.RSSfeeds.posts.forEach((post) => actualPostsLinks.push(post.itemLink));
-  //         const newPosts = parsedResponse.posts
-  //           .filter((postNewResponse) => !actualPostsLinks.includes(postNewResponse.itemLink));
-  //         watchedState.RSSfeeds.posts.push(newPosts);
-  //         watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
-  //         return newPosts;
-  //       });
-  //     })
-  //       .catch((e) => console.log(e))
-  //       .finally(checkEvery5Sec);
-  //   }, '5000');
-  // };
-
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    // блокируем отправку запроса, если предыдйший запрос все еще обрабатывается
-    if (watchedState.addingFeedProcess.processState === 'sending') {
-      return;
-    }
+
     watchedState.RSSform.data.url = elements.input.value;
     validate(watchedState.RSSform.data)
       .then(() => {
@@ -112,17 +81,17 @@ const app = (i18nextInstance) => {
       })
       .then((response) => {
         const parsedResponse = parseRSS(response);
-        watchedState.addingFeedProcess.errorMessage = 'no error';
+        watchedState.addingFeedProcess.errorMessage = 'successMessage';
         watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
         watchedState.RSSfeeds.posts.push(parsedResponse.posts);
         watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
-        watchedState.addingFeedProcess.processState = 'nothing happens';
+        watchedState.addingFeedProcess.processState = 'idle';
         return parsedResponse;
       })
       .catch((er) => {
-        console.log(er.message);
-        const errorsMessages = ['url must be a valid URL', 'url must not be one of the following values', 'parsing error', 'netWork error'];
+        console.log(er);
+        const errorsMessages = ['errorLink', 'errorDuplicates', 'errorParse', 'errorNetwork'];
         if (errorsMessages.includes(er.message)) {
           watchedState.addingFeedProcess.errorMessage = er.message;
           watchedState.addingFeedProcess.processState = 'completed with error';
@@ -150,7 +119,6 @@ const app = (i18nextInstance) => {
       });
 
       if (targetEl.localName === 'button') {
-        watchedState.UI.modal.status = 'active';
         watchedState.UI.modal.postLink = link;
       }
     }

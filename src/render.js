@@ -5,35 +5,14 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const feedbackRender = (errorMessage, i18next) => {
-  console.log(errorMessage);
-  switch (errorMessage) {
-    case 'url must not be one of the following values':
-      elements.error.classList.add('text-danger');
-      elements.error.classList.remove('text-success');
-      elements.error.innerHTML = i18next.t('errorDuplicates');
-      break;
-    case 'url must be a valid URL':
-      elements.error.classList.add('text-danger');
-      elements.error.classList.remove('text-success');
-      elements.error.innerHTML = i18next.t('errorLink');
-      break;
-    case 'parsing error':
-      elements.error.classList.remove('text-success');
-      elements.error.classList.add('text-danger');
-      elements.error.innerHTML = i18next.t('errorParse');
-      break;
-    case 'netWork error':
-      elements.error.classList.remove('text-success');
-      elements.error.classList.add('text-danger');
-      elements.error.innerHTML = i18next.t('errorNetwork');
-      break;
-    case 'no error':
-      elements.error.classList.add('text-success');
-      elements.error.classList.remove('text-danger');
-      elements.error.innerHTML = i18next.t('successMessage');
-      break;
-    default:
-      elements.error.innerHTML = '';
+  if (errorMessage === 'successMessage') {
+    elements.error.classList.add('text-success');
+    elements.error.classList.remove('text-danger');
+    elements.error.textContent = i18next.t(errorMessage);
+  } else {
+    elements.error.classList.add('text-danger');
+    elements.error.classList.remove('text-success');
+    elements.error.textContent = i18next.t(errorMessage);
   }
 };
 
@@ -65,7 +44,7 @@ const feedsRender = (watchedState, i18next) => {
   cardBody.classList.add('card-body');
   const cardTitle = document.createElement('h2');
   cardTitle.classList.add('card-title', 'h4');
-  cardTitle.innerHTML = i18next.t('feedsHeader');
+  cardTitle.textContent = i18next.t('feedsHeader');
   cardBody.append(cardTitle);
   card.append(cardBody);
 
@@ -77,11 +56,11 @@ const feedsRender = (watchedState, i18next) => {
     li.classList.add('list-group-item', 'border-0', 'border-end-0');
     const h3 = document.createElement('h3');
     h3.classList.add('h6', 'm-0');
-    h3.innerHTML = feed.feedTitle;
+    h3.textContent = feed.feedTitle;
     li.append(h3);
     const p = document.createElement('p');
     p.classList.add('m-0', 'small', 'text-black-50');
-    p.innerHTML = feed.feedDesc;
+    p.textContent = feed.feedDesc;
     li.append(p);
     listOfFeeds.append(li);
   });
@@ -96,7 +75,7 @@ const postsRender = (watchedState, i18next) => {
   cardPostsBody.classList.add('card-body');
   const cardPostsTitle = document.createElement('h2');
   cardPostsTitle.classList.add('card-title', 'h4');
-  cardPostsTitle.innerHTML = i18next.t('postsHeader');
+  cardPostsTitle.textContent = i18next.t('postsHeader');
   cardPostsBody.append(cardPostsTitle);
   cardPosts.append(cardPostsBody);
 
@@ -116,12 +95,12 @@ const postsRender = (watchedState, i18next) => {
     }
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
-    a.innerHTML = post.itemTitle;
+    a.textContent = post.itemTitle;
     li.append(a);
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    btn.innerHTML = i18next.t('btnCheckOut');
+    btn.textContent = i18next.t('btnCheckOut');
     btn.setAttribute('data-bs-toggle', 'modal');
     btn.setAttribute('data-bs-target', '#modal');
     li.append(btn);
@@ -130,54 +109,54 @@ const postsRender = (watchedState, i18next) => {
 };
 
 const modalRender = (watchedState, i18next) => {
-  if (watchedState.UI.modal.status === 'active') {
-    const modalFade = document.querySelector('#modal');
-    const modalTitle = modalFade.querySelector('.modal-title');
-    const modalDesc = modalFade.querySelector('.modal-body');
-    const btnRead = modalFade.querySelector('.full-article');
-    btnRead.innerHTML = i18next.t('btnRead');
-    const currentPostArray = watchedState.RSSfeeds.posts
-      .filter((post) => post.itemLink === watchedState.UI.modal.postLink);
-    const [currentPost] = currentPostArray;
-    modalTitle.innerHTML = currentPost.itemTitle;
-    modalDesc.innerHTML = currentPost.itemDesc;
-    btnRead.setAttribute('href', currentPost.itemLink);
-  }
+  const modalFade = document.querySelector('#modal');
+  const modalTitle = modalFade.querySelector('.modal-title');
+  const modalDesc = modalFade.querySelector('.modal-body');
+  const btnRead = modalFade.querySelector('.full-article');
+  btnRead.textContent = i18next.t('btnRead');
+  const currentPostArray = watchedState.RSSfeeds.posts
+    .filter((post) => post.itemLink === watchedState.UI.modal.postLink);
+  const [currentPost] = currentPostArray;
+  modalTitle.textContent = currentPost.itemTitle;
+  modalDesc.textContent = currentPost.itemDesc;
+  btnRead.setAttribute('href', currentPost.itemLink);
 };
 
 const handleFormDisabling = (processState) => {
   if (processState === 'sending') {
-    elements.form.disabled = true;
+    elements.button.disabled = true;
+    elements.input.readOnly = true;
   }
-  elements.form.disabled = false;
+  elements.button.disabled = false;
+  elements.input.readOnly = false;
 };
 
 const createWatchState = (state, i18next) => onChange(state, function f(path, value) {
-  elements.button.innerHTML = i18next.t('button');
-  document.querySelector('[class = "display-3 mb-0"]').innerHTML = i18next.t('h1');
-  document.querySelector('[class = "lead"]').innerHTML = i18next.t('p');
-  document.querySelector('[for="url-input"]').innerHTML = i18next.t('urlInput');
-  document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').innerHTML = i18next.t('example');
+  elements.button.textContent = i18next.t('button');
+  document.querySelector('[class = "display-3 mb-0"]').textContent = i18next.t('h1');
+  document.querySelector('[class = "lead"]').textContent = i18next.t('p');
+  document.querySelector('[for="url-input"]').textContent = i18next.t('urlInput');
+  document.querySelector('[class="mt-2 mb-0 text-secondary fs-6"]').textContent = i18next.t('example');
 
-  if (path === 'addingFeedProcess.processState') {
-    handleFormDisabling(value);
-    formInputRender(value, state);
-  }
-
-  if (path === 'addingFeedProcess.errorMessage') {
-    feedbackRender(value, i18next);
-  }
-
-  if (path === 'RSSfeeds.feeds') {
-    feedsRender(this, i18next);
-  }
-
-  if (path === 'RSSfeeds.posts') {
-    postsRender(this, i18next);
-  }
-
-  if (path === 'UI.modal.postLink') {
-    modalRender(this, i18next);
+  switch (path) {
+    case ('addingFeedProcess.processState'):
+      handleFormDisabling(value);
+      formInputRender(value, state);
+      break;
+    case ('addingFeedProcess.errorMessage'):
+      feedbackRender(value, i18next);
+      break;
+    case ('RSSfeeds.feeds'):
+      feedsRender(this, i18next);
+      break;
+    case ('RSSfeeds.posts'):
+      postsRender(this, i18next);
+      break;
+    case ('UI.modal.postLink'):
+      modalRender(this, i18next);
+      break;
+    default:
+      break;
   }
 });
 
