@@ -88,6 +88,7 @@ const postsRender = (watchedState, i18next) => {
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
     a.setAttribute('href', post.itemLink);
+    a.setAttribute('data-link', post.itemLink);
     a.classList.add('fw-bold');
     if (post.uiState === 'visited') {
       a.classList.remove('fw-bold');
@@ -98,6 +99,7 @@ const postsRender = (watchedState, i18next) => {
     a.textContent = post.itemTitle;
     li.append(a);
     const btn = document.createElement('button');
+    btn.setAttribute('data-link', post.itemLink);
     btn.setAttribute('type', 'button');
     btn.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     btn.textContent = i18next.t('btnCheckOut');

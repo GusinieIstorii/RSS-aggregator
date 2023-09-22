@@ -16,7 +16,7 @@ const state = {
     },
   },
   addingFeedProcess: {
-    processState: 'idle', // есть конечно сомнения насчет нейминга
+    processState: 'idle',
     errorMessage: '',
   },
   RSSfeeds: {
@@ -34,15 +34,42 @@ const state = {
 const app = (i18nextInstance) => {
   const watchedState = createWatchState(state, i18nextInstance);
 
-  const validate = (fields) => {
-    const schema = yup.object({
-      url: yup.string()
+  // const validate = (url) => {
+  //   const urlSchema = yup.string()
+  //     .url('errorLink')
+  //     .nullable()
+  //     .notOneOf(watchedState.RSSfeeds.urls, 'errorDuplicates');
+
+  //   return urlSchema.validate(url);
+  // };
+
+  // class ValidationErrorCustom extends ValidationError {
+
+  // }
+
+  const validate = (url) => {
+    const validateSchema = (link) => {
+      const urlSchema = yup.string()
         .url('errorLink')
         .nullable()
-        .notOneOf(watchedState.RSSfeeds.urls, 'errorDuplicates'),
-    });
+        .notOneOf(watchedState.RSSfeeds.urls, 'errorDuplicates');
 
-    return schema.validate(fields);
+      return urlSchema.validate(link);
+    };
+
+    return validateSchema(url)
+      .then((result) => result)
+      .catch((error) => {
+        class ValidationErrorCustom extends Error {
+          constructor(message) {
+            super(message);
+            this.name = 'ValidationErrorCustom';
+            this.isValidationError = true;
+          }
+        }
+        const msg = error.message;
+        throw new ValidationErrorCustom(msg);
+      });
   };
 
   const checkEvery5Sec = () => {
@@ -72,17 +99,17 @@ const app = (i18nextInstance) => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-
-    watchedState.RSSform.data.url = elements.input.value;
-    validate(watchedState.RSSform.data)
+    const url = elements.input.value;
+    watchedState.RSSform.data.url = url;
+    validate(url)
       .then(() => {
         watchedState.addingFeedProcess.processState = 'sending';
-        return getResponse(state.RSSform.data.url);
+        return getResponse(url);
       })
       .then((response) => {
         const parsedResponse = parseRSS(response);
         watchedState.addingFeedProcess.errorMessage = 'successMessage';
-        watchedState.RSSfeeds.urls.push(watchedState.RSSform.data.url);
+        watchedState.RSSfeeds.urls.push(url);
         watchedState.RSSfeeds.feeds.push(parsedResponse.feed);
         watchedState.RSSfeeds.posts.push(parsedResponse.posts);
         watchedState.RSSfeeds.posts = watchedState.RSSfeeds.posts.flat();
@@ -90,7 +117,7 @@ const app = (i18nextInstance) => {
         return parsedResponse;
       })
       .catch((er) => {
-        console.log(er);
+        console.log(er.isValidationError);
         const errorsMessages = ['errorLink', 'errorDuplicates', 'errorParse', 'errorNetwork'];
         if (errorsMessages.includes(er.message)) {
           watchedState.addingFeedProcess.errorMessage = er.message;
@@ -106,20 +133,18 @@ const app = (i18nextInstance) => {
   const postsContainer = document.querySelector('.posts');
   postsContainer.addEventListener('click', (e) => {
     const targetEl = e.target;
-    const li = targetEl.parentElement;
-    const linkEl = li.querySelector('a');
-    const link = linkEl.getAttribute('href');
+    const url = targetEl.getAttribute('data-link');
 
-    if (targetEl.localName === 'button' || targetEl.localName === 'a') {
+    if (url) {
       watchedState.RSSfeeds.posts.map((post) => {
-        if (post.itemLink === link) {
+        if (post.itemLink === url) {
           post.uiState = 'visited';
         }
         return post;
       });
 
       if (targetEl.localName === 'button') {
-        watchedState.UI.modal.postLink = link;
+        watchedState.UI.modal.postLink = url;
       }
     }
   });
