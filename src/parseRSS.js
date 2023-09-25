@@ -25,7 +25,15 @@ const parseRSS = (response) => {
     };
     return result;
   } catch (e) {
-    throw new Error('errorParse');
+    class ParsingErrorCustom extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'ParsingErrorCustom';
+        this.isErrorParse = true;
+      }
+    }
+    const msg = e.message;
+    throw new ParsingErrorCustom(msg);
   }
 };
 

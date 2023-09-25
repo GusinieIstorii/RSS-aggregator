@@ -34,19 +34,6 @@ const state = {
 const app = (i18nextInstance) => {
   const watchedState = createWatchState(state, i18nextInstance);
 
-  // const validate = (url) => {
-  //   const urlSchema = yup.string()
-  //     .url('errorLink')
-  //     .nullable()
-  //     .notOneOf(watchedState.RSSfeeds.urls, 'errorDuplicates');
-
-  //   return urlSchema.validate(url);
-  // };
-
-  // class ValidationErrorCustom extends ValidationError {
-
-  // }
-
   const validate = (url) => {
     const validateSchema = (link) => {
       const urlSchema = yup.string()
@@ -64,7 +51,16 @@ const app = (i18nextInstance) => {
           constructor(message) {
             super(message);
             this.name = 'ValidationErrorCustom';
-            this.isValidationError = true;
+            switch (message) {
+              case ('errorLink'):
+                this.isValidationErrorLink = true;
+                break;
+              case ('errorDuplicates'):
+                this.isValidationErrorDuplicates = true;
+                break;
+              default:
+                break;
+            }
           }
         }
         const msg = error.message;
@@ -117,11 +113,16 @@ const app = (i18nextInstance) => {
         return parsedResponse;
       })
       .catch((er) => {
-        console.log(er.isValidationError);
-        const errorsMessages = ['errorLink', 'errorDuplicates', 'errorParse', 'errorNetwork'];
-        if (errorsMessages.includes(er.message)) {
-          watchedState.addingFeedProcess.errorMessage = er.message;
-          watchedState.addingFeedProcess.processState = 'completed with error';
+        console.log(er.message);
+        watchedState.addingFeedProcess.processState = 'completed with error';
+        if (er.isValidationErrorLink) {
+          watchedState.addingFeedProcess.errorMessage = 'errorLink';
+        } else if (er.isValidationErrorDuplicates) {
+          watchedState.addingFeedProcess.errorMessage = 'errorDuplicates';
+        } else if (er.isAxiosError) {
+          watchedState.addingFeedProcess.errorMessage = 'errorNetwork';
+        } else if (er.isErrorParse) {
+          watchedState.addingFeedProcess.errorMessage = 'errorParse';
         } else {
           throw new Error('unknown error');
         }
